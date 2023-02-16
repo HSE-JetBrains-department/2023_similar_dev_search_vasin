@@ -13,4 +13,4 @@
 7. Осуществить задачу similar dev search
 
 ## Оценка:
-Формула оценки: оценка = github_api * 0.15 + git * 0.25 + enry1 * 0.2 + tree_sitter2 * 0.25 + similar_dev_search * 0.15
+Формула оценки: оценка = `github_api * 0.15 + git * 0.25 + enry * 0.2 + tree_sitter * 0.25 + similar_dev_search * 0.15`
