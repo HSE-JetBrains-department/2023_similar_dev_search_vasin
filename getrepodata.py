@@ -1,14 +1,11 @@
 from collections import defaultdict
-from pathlib import Path
-
 import requests
 from pydriller import Repository
 import tqdm
 
 
-def get_top_from_stargazers(repopath):
-    path_to_repo = Path(repopath)
-    url = f"https://api.github.com/repos/{path_to_repo.parts[-2]}/{path_to_repo.parts[-1]}"
+def get_top_from_stargazers(repo_url):
+    url = f"https://api.github.com/repos/{repo_url.split('/')[-2]}/{repo_url.split('/')[-1]}"
     url += "/stargazers?page={}&per_page=100"
     stargazers = set()
     page = 1
