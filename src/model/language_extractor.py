@@ -1,7 +1,7 @@
 import os
 from collections import defaultdict
 from pathlib import Path
-from typing import List, Tuple
+from typing import Tuple
 
 import enry
 import git
@@ -13,7 +13,12 @@ from model.constants import headers
 from model.languages import all_languages
 
 
-def fetch_treesitter_repo(url: str):
+def fetch_treesitter_repo(url: str) -> Repo:
+    """
+    clones a repository with treesitter language specification
+    :param url: url of the repo
+    :return: dulwich Repo for a language
+    """
     repo_name = url[url.rfind('/') + 1:]
     path_to_repo = str(Path(f"{Path().cwd().parent}/treesitter/{repo_name}"))
     parent_path = str(Path(path_to_repo).parent)
@@ -53,6 +58,12 @@ Language.build_library(
 
 
 def get_variables(language: str, code: str) -> defaultdict[int]:
+    """
+    Returns variables from code
+    :param language: language of the code
+    :param code: source code
+    :return: dict of variables {variable_name: occurrences}
+    """
     identifiers = defaultdict(int)
     code = bytes(code, 'utf-8')
     parser = Parser()
@@ -78,6 +89,13 @@ def get_variables(language: str, code: str) -> defaultdict[int]:
 
 async def fetch_language_variables(file_url: str, file_name: str, asyncio_client: httpx.AsyncClient = None) -> \
         Tuple[str, defaultdict[int]]:
+    """
+    Returns language used and dict of variables from file
+    :param file_url: url of file on github
+    :param file_name: name of the file
+    :param asyncio_client: asyncio client to perform requests from
+    :return: language and dict of variables
+    """
     if asyncio_client is None:
         client = httpx.AsyncClient(timeout=None)
     else:

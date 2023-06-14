@@ -12,11 +12,24 @@ from model.repository import Repository
 
 
 async def fetch_stargazers_for_page(client: httpx.AsyncClient, url, page):
+    """
+    For a given page, returns list of stargazer urls
+    :param client:  asyncio client to perform requests from
+    :param url: url string with a missing page format
+    :param page: page number
+    :return: Json with stargazers
+    """
     response = await client.get(url.format(page), headers=headers)
     return response.json()
 
 
-async def fetch_stargazers_for_repo(asyncio_client: httpx.AsyncClient, url: str) -> List[str]:
+async def fetch_stargazers_for_repo(url: str, asyncio_client: httpx.AsyncClient = None) -> List[str]:
+    """
+    For a given repository url, returns list of stargazer urls
+    :param asyncio_client: asyncio client to perform requests from
+    :param url: url of the repository
+    :return: list of stargazer urls
+    """
     stargazers = set()
     tasks = []
 
@@ -43,26 +56,20 @@ async def fetch_stargazers_for_repo(asyncio_client: httpx.AsyncClient, url: str)
     return list(stargazers)
 
 
-async def fetch_all_repos(url, stargazers):
-    async with httpx.AsyncClient(timeout=None) as client:
-        repo_url_feature = "html_url"
-        starred_repos = defaultdict(int)
-        for stargazer_ind, stargazer in enumerate(stargazers):
-            response = await asyncio.gather(
-                *map(fetch_repos, itertools.repeat(client), itertools.repeat(url), itertools.repeat(stargazer),
-                     list(range(1, repos_pages_num)))
-            )
-            for repo in response[0]:
-                starred_repos[repo[repo_url_feature]] += 1
-        return starred_repos
-
-
-async def fetch_all_repos_for_stargazer(page_url_template: str, asyncio_client, stargazer_id: str) -> List[Repository]:
+async def fetch_all_repos_for_developer(page_url_template: str, developer_id: str,
+                                        asyncio_client: httpx.AsyncClient = None) -> List[Repository]:
+    """
+    For a given developer id, returns all repositories urls
+    :param page_url_template: a string template with developer id missing
+    :param asyncio_client: asyncio client to perform requests from
+    :param developer_id: id of a developer
+    :return: list of repositories
+    """
     repo_url_feature = "html_url"
     starred_repos = list()
     response = await asyncio.gather(
         *map(fetch_repos, itertools.repeat(asyncio_client), itertools.repeat(page_url_template),
-             itertools.repeat(stargazer_id),
+             itertools.repeat(developer_id),
              list(range(1, repos_pages_num)))
     )
     for repo_json in response[0]:
@@ -71,6 +78,13 @@ async def fetch_all_repos_for_stargazer(page_url_template: str, asyncio_client, 
     return starred_repos
 
 
-async def fetch_repos(client: httpx.AsyncClient, page_url_template: str, stargazer_id: str, page: int):
-    response = await client.get(page_url_template.format(stargazer_id, page), headers=headers)
+async def fetch_repos(client: httpx.AsyncClient, page_url_template: str, developer_id: str, page: int):
+    """
+    For a given developer id and page number, get json with all repositories
+    :param client: asyncio client to perform requests from
+    :param page_url_template: a template for a page with missing developer id and page number
+    :param developer_id: id of developer
+    :param page: page number
+    """
+    response = await client.get(page_url_template.format(developer_id, page), headers=headers)
     return response.json()

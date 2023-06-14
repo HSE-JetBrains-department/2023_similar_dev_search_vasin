@@ -23,6 +23,11 @@ class Developer:
         self.id = id
 
     async def get_stargazes(self, asyncio_client: httpx.AsyncClient = None) -> List[Repository]:
+        """
+        Gets list of stargazed repositories
+        :param asyncio_client: asyncio client to perform requests from
+        :return: stargazed repositories
+        """
         page_url_template = "https://api.github.com/users/" + self.id + "/starred?page={}&per_page=100"
 
         if asyncio_client is None:
@@ -30,19 +35,29 @@ class Developer:
         else:
             client = asyncio_client
 
-        starred_repos = await fetcher.fetch_all_repos_for_stargazer(page_url_template, client, self.id)
+        starred_repos = await fetcher.fetch_all_repos_for_developer(page_url_template, self.id, client)
         if asyncio_client is None:
             await client.aclose()
 
         return starred_repos
 
     async def get_languages(self, asyncio_client: httpx.AsyncClient = None) -> defaultdict[int]:
+        """
+        Gets dict of languages used by the developer
+        :param asyncio_client: asyncio client to perform requests from
+        :return: dict with language key and number of occurrences value
+        """
         if self.languages is not None:
             return self.languages
         languages, _ = await self.get_languages_variables(asyncio_client)
         return languages
 
     async def get_variables(self, asyncio_client: httpx.AsyncClient = None) -> defaultdict[int]:
+        """
+        Gets dict of variables used by the developer
+        :param asyncio_client:  asyncio client to perform requests from
+        :return: dict with variable key and number of occurrences value
+        """
         if self.variables is not None:
             return self.variables
         _, variables = await self.get_languages_variables(asyncio_client)
@@ -50,6 +65,11 @@ class Developer:
 
     async def get_languages_variables(self, asyncio_client: httpx.AsyncClient = None) \
             -> Tuple[defaultdict[int], defaultdict[int]]:
+        """
+        Gets both languages and variables that developer uses
+        :param asyncio_client:  asyncio client to perform requests from
+        :return: dict of languages, dict of variables
+        """
         if self.languages is not None and self.variables is not None:
             return self.languages, self.variables
         self.languages = defaultdict(int)
@@ -66,6 +86,10 @@ class Developer:
         return self.url
 
     async def get_total_dict(self) -> dict[int]:
+        """
+        Gets united dict for languages and variables
+        :return: dict of languages, variables and their respective occurrences
+        """
         total_dict = dict()
 
         for variable in (await self.get_variables()).keys():
@@ -76,6 +100,11 @@ class Developer:
         return total_dict
 
     async def compute_similarity(self, other: 'Developer') -> float:
+        """
+        Calculates similarity between self and other developer
+        :param other: developer to compute similarity to
+        :return: a float - cosine similarity of list of common variables and languages
+        """
         my_total_dict = await self.get_total_dict()
         other_total_dict = await other.get_total_dict()
 
@@ -96,6 +125,11 @@ class Developer:
         ).reshape(-1)
 
     async def get_repos(self, asyncio_client: httpx.AsyncClient = None) -> List[Repository]:
+        """
+        Gets list of repositories for the current deveoper
+        :param asyncio_client: asyncio client to perform requests from
+        :return: list of repositories that developer uses
+        """
         if self.repos is not None:
             return self.repos
 

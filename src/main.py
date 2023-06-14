@@ -10,11 +10,13 @@ from model.repository import Repository
 from tqdm import tqdm
 
 
-def get_similar_developers(start_developer: Developer) -> List[Repository]:
-    return asyncio.run(get_candidates(start_developer))
-
-
 async def get_candidates(start_developer: Developer, asyncio_client: httpx.AsyncClient = None) -> List[Developer]:
+    """
+    Return list of developers (candidates) from stargazers of stargazed repositories
+    :param start_developer: developer, from whom to start looking for candidates
+    :param asyncio_client: asyncio client to perform requests from
+    :return:
+    """
     developer_stargazes = await start_developer.get_stargazes(asyncio_client)
     tasks = []
     candidates = set[Developer]()
@@ -25,7 +27,7 @@ async def get_candidates(start_developer: Developer, asyncio_client: httpx.Async
     for repo in tqdm(developer_stargazes, total=len(developer_stargazes),
                      desc="gathering candidates from starred repos"):
         tasks.append(
-            fetch_stargazers_for_repo(client, repo.url)
+            fetch_stargazers_for_repo(repo.url, client)
         )
 
     response = await asyncio.gather(*tasks)
@@ -40,6 +42,12 @@ async def get_candidates(start_developer: Developer, asyncio_client: httpx.Async
 
 
 def compute_similarities(main_developer, developers) -> List[float]:
+    """
+    Get similarities between a developer and a list of others
+    :param main_developer: base developer
+    :param developers: other developers
+    :return: list of similarities (cosine similarity based on languages and vars)
+    """
     result = []
     i = 0
     for developer in tqdm(developers, desc='computing similarities between developers'):

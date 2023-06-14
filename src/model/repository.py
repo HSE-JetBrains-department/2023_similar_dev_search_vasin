@@ -19,24 +19,43 @@ class Repository:
         self.repo_name = self.url.split('/')[-1]
 
     def get_stargazers(self):
-        return fetcher.fetch_stargazers_for_page(self.url)
+        """
+        Returns list of stargazers
+        :return:
+        """
+        return fetcher.fetch_stargazers_for_repo(self.url)
 
     def __str__(self):
         return self.url
 
     async def get_languages(self, asyncio_client: httpx.AsyncClient = None) -> defaultdict[int]:
+        """
+        Returns dict of languages for this repo
+        :param asyncio_client: asyncio client to perform requests from
+        :return: dict {language: occurrences}
+        """
         if self.languages is not None:
             return self.languages
         languages, _ = await self.get_languages_variables(asyncio_client)
         return languages
 
     async def get_variables(self, asyncio_client: httpx.AsyncClient = None) -> defaultdict[int]:
+        """
+        Returns dict of variables for this repo
+        :param asyncio_client: asyncio client to perform requests from
+        :return: dict {variable: occurrences}
+        """
         if self.variables is not None:
             return self.variables
         _, variables = await self.get_languages_variables(asyncio_client)
         return variables
 
     async def get_languages_variables(self, asyncio_client: httpx.AsyncClient = None):
+        """
+        Returns dict of languages and dict of variables
+        :param asyncio_client: asyncio client to perform requests from
+        :return: dict of languages, dict of variables
+        """
         if self.languages is not None and self.variables is not None:
             return self.languages, self.variables
 
