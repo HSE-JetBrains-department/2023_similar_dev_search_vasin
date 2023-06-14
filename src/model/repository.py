@@ -51,11 +51,6 @@ class Repository:
         return variables
 
     async def get_languages_variables(self, asyncio_client: httpx.AsyncClient = None):
-        """
-        Returns dict of languages and dict of variables
-        :param asyncio_client: asyncio client to perform requests from
-        :return: dict of languages, dict of variables
-        """
         if self.languages is not None and self.variables is not None:
             return self.languages, self.variables
 
