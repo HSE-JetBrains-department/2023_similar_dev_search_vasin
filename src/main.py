@@ -55,6 +55,7 @@ def compute_similarities(main_developer, developers) -> List[float]:
         result.append(asyncio.run(main_developer.compute_similarity(developer)))
     return result
 
+
 if __name__ == '__main__':
     print('Enter the github url of the developer, for which to find similar devs: ')
     starting_developer_url = input()
@@ -65,9 +66,8 @@ if __name__ == '__main__':
     print('Gathered', len(candidates), 'candidates, limiting to', max_candidates_num)
     candidates = candidates[0:min(len(candidates), max_candidates_num)]
     similarities = compute_similarities(starting_developer, candidates)
-    print(similarities)
     sorted_devs = [developer for _, developer in sorted(zip(similarities, candidates), key=lambda x: x[0])]
-
+    print(similarities)
     print('top developers similar to the given: ')
     for developer in sorted_devs:
         print(developer)

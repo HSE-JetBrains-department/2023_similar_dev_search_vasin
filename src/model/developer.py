@@ -75,6 +75,7 @@ class Developer:
         self.languages = defaultdict(int)
         self.variables = defaultdict(int)
         repos = await self.get_repos()
+
         for i in range(min(repos_limit, len(repos))):
             for language in (await repos[i].get_languages(asyncio_client)).keys():
                 self.languages[language] += (await repos[i].get_languages(asyncio_client))[language]
@@ -97,6 +98,7 @@ class Developer:
 
         for language in (await self.get_languages()).keys():
             total_dict[language] = (await self.get_languages())[language]
+
         return total_dict
 
     async def compute_similarity(self, other: 'Developer') -> float:
@@ -147,4 +149,5 @@ class Developer:
 
         repo_url_feature = "html_url"
         #print(repos_data)
-        return [Repository(resp[repo_url_feature]) for resp in repos_data]
+        self.repos = [Repository(resp[repo_url_feature]) for resp in repos_data]
+        return self.repos
