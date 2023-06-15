@@ -72,7 +72,7 @@ class Repository:
 
         tasks = []
         for file in files_data:
-            if file is not dict:
+            if file is str:
                 continue
             if "type" not in file:
                 continue

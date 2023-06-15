@@ -92,7 +92,6 @@ class Developer:
         :return: dict of languages, variables and their respective occurrences
         """
         total_dict = dict()
-
         for variable in (await self.get_variables()).keys():
             total_dict[variable] = (await self.get_variables())[variable]
 
