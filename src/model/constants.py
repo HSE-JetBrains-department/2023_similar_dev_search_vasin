@@ -1,6 +1,8 @@
 headers = {'Authorization': 'token '}
 
-token = input('Github token: ')
+print('Enter github token:')
+token = input()
+
 headers['Authorization'] = 'token ' + token
 stargazer_pages_num = 2
 repos_pages_num = 2

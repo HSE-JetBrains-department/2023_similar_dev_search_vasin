@@ -18,6 +18,4 @@ COPY  requirements.txt /application/requirements.txt
 
 RUN pip install -r /application/requirements.txt
 
-ENTRYPOINT [ "python", "./src/main.py"]
-
 COPY . .

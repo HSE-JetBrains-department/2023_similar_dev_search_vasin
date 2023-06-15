@@ -3,10 +3,11 @@ from typing import List
 
 import httpx
 
+from model import constants
 from model.constants import max_candidates_num
 from model.developer import Developer
 from model.fetcher import fetch_stargazers_for_repo
-from model.repository import Repository
+
 from tqdm import tqdm
 
 
@@ -54,9 +55,9 @@ def compute_similarities(main_developer, developers) -> List[float]:
         result.append(asyncio.run(main_developer.compute_similarity(developer)))
     return result
 
-
 if __name__ == '__main__':
-    starting_developer_url = input('Enter the github url of the developer, for which to find similar devs: ')
+    print('Enter the github url of the developer, for which to find similar devs: ')
+    starting_developer_url = input()
     starting_developer = Developer(starting_developer_url)
 
     repos = asyncio.run(starting_developer.get_repos())
@@ -65,7 +66,7 @@ if __name__ == '__main__':
     candidates = candidates[0:min(len(candidates), max_candidates_num)]
     similarities = compute_similarities(starting_developer, candidates)
     print(similarities)
-    sorted_devs = [developer for _, developer in sorted(zip(similarities, candidates))]
+    sorted_devs = [developer for _, developer in sorted(zip(similarities, candidates), key=lambda x: x[0])]
 
     print('top developers similar to the given: ')
     for developer in sorted_devs:

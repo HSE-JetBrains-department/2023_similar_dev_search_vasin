@@ -2,8 +2,7 @@ import asyncio
 from collections import defaultdict
 
 import httpx
-from pygments.lexers import get_lexer_for_filename
-from tqdm import tqdm
+
 
 import model.fetcher as fetcher
 from model.constants import headers
