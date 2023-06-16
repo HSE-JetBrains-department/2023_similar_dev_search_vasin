@@ -65,7 +65,6 @@ if __name__ == '__main__':
     candidates = candidates[0:min(len(candidates), max_candidates_num)]
     similarities = compute_similarities(starting_developer, candidates)
     sorted_devs = [developer for _, developer in sorted(zip(similarities, candidates), key=lambda x: x[0])]
-    print(similarities)
     print('top developers similar to the given: ')
     for developer in sorted_devs:
         print(developer)
