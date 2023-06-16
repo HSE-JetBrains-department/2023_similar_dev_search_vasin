@@ -32,7 +32,7 @@ def fetch_treesitter_repo(url: str) -> Repo:
     return Repo(path_to_repo)
 
 
-supported_languages = ['c', 'c-sharp', 'cpp']#, 'kotlin', 'python', 'javascript', 'java']
+supported_languages = ['c', 'c-sharp', 'cpp']  # , 'kotlin', 'python', 'javascript', 'java']
 aliases = {'c#': 'c-sharp', 'c++': 'cpp', 'js': 'javascript'}
 TREE_SITTER_C_SHARP = fetch_treesitter_repo("https://github.com/tree-sitter/tree-sitter-c-sharp")
 TREE_SITTER_C = fetch_treesitter_repo("https://github.com/tree-sitter/tree-sitter-c")

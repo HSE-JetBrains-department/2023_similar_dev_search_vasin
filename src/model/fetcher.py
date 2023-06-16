@@ -1,10 +1,8 @@
 import asyncio
-
+import itertools
+from typing import List
 
 import httpx
-import itertools
-
-from typing import List
 
 from model.constants import headers, stargazer_pages_num, repos_pages_num
 from model.repository import Repository
