@@ -1,15 +1,13 @@
-import asyncio
-import itertools
 from collections import defaultdict
+from typing import List, Tuple
 
 import httpx
-from typing import List, Tuple
+import pandas as pd
+from sklearn.metrics.pairwise import cosine_similarity
 
 import model.fetcher as fetcher
 from model.constants import headers, repos_limit
 from model.repository import Repository
-import pandas as pd
-from sklearn.metrics.pairwise import cosine_similarity
 
 
 class Developer:
@@ -147,6 +145,6 @@ class Developer:
             await client.aclose()
 
         repo_url_feature = "html_url"
-        #print(repos_data)
+        # print(repos_data)
         self.repos = [Repository(resp[repo_url_feature]) for resp in repos_data]
         return self.repos

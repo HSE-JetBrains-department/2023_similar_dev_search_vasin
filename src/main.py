@@ -2,13 +2,11 @@ import asyncio
 from typing import List
 
 import httpx
+from tqdm import tqdm
 
-from model import constants
 from model.constants import max_candidates_num
 from model.developer import Developer
 from model.fetcher import fetch_stargazers_for_repo
-
-from tqdm import tqdm
 
 
 async def get_candidates(start_developer: Developer, asyncio_client: httpx.AsyncClient = None) -> List[Developer]:

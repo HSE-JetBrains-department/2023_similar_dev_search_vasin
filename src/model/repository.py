@@ -3,7 +3,6 @@ from collections import defaultdict
 
 import httpx
 
-
 import model.fetcher as fetcher
 from model.constants import headers
 from model.language_extractor import fetch_language_variables
