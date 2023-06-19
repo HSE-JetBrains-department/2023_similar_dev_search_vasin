@@ -84,6 +84,45 @@ class Developer:
     def __str__(self) -> str:
         return self.url
 
+    async def get_total_dict(self) -> dict[int]:
+        """
+        Gets united dict for languages and variables
+        :return: dict of languages, variables and their respective occurrences
+        """
+        total_dict = dict()
+        for variable in (await self.get_variables()).keys():
+            total_dict[variable] = (await self.get_variables())[variable]
+
+        for language in (await self.get_languages()).keys():
+            total_dict[language] = (await self.get_languages())[language]
+
+        return total_dict
+
+    async def compute_similarity(self, other: 'Developer') -> float:
+        """
+        Calculates similarity between self and other developer
+        :param other: developer to compute similarity to
+        :return: a float - cosine similarity of list of common variables and languages
+        """
+        my_total_dict = await self.get_total_dict()
+        other_total_dict = await other.get_total_dict()
+
+        for entry in my_total_dict:
+            if entry not in other_total_dict:
+                other_total_dict[entry] = 0
+
+        for entry in other_total_dict:
+            if entry not in my_total_dict:
+                my_total_dict[entry] = 0
+
+        my_df = pd.DataFrame(my_total_dict, index=[0])
+        other_df = pd.DataFrame(other_total_dict, index=[0])
+        if len(my_df.keys()) == 0:
+            return 0.0
+        return cosine_similarity(
+            my_df, other_df
+        ).reshape(-1)
+
     async def get_repos(self, asyncio_client: httpx.AsyncClient = None) -> List[Repository]:
         """
         Gets list of repositories for the current deveoper

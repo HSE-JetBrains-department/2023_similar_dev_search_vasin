@@ -41,6 +41,20 @@ async def get_candidates(start_developer: Developer, asyncio_client: httpx.Async
     return list(candidates)
 
 
+def compute_similarities(main_developer, developers) -> List[float]:
+    """
+    Get similarities between a developer and a list of others
+    :param main_developer: base developer
+    :param developers: other developers
+    :return: list of similarities (cosine similarity based on languages and vars)
+    """
+    result = []
+    i = 0
+    for developer in tqdm(developers, desc='computing similarities between developers'):
+        result.append(asyncio.run(main_developer.compute_similarity(developer)))
+    return result
+
+
 if __name__ == '__main__':
     print('Enter github token:')
     token = input()
@@ -54,3 +68,8 @@ if __name__ == '__main__':
     candidates = asyncio.run(get_candidates(starting_developer))
     print('Gathered', len(candidates), 'candidates, limiting to', max_candidates_num)
     candidates = candidates[0:min(len(candidates), max_candidates_num)]
+    similarities = compute_similarities(starting_developer, candidates)
+    sorted_devs = [developer for _, developer in sorted(zip(similarities, candidates), key=lambda x: x[0])]
+    print('top developers similar to the given: ')
+    for developer in sorted_devs:
+        print(developer)
