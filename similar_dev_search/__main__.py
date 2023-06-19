@@ -81,7 +81,7 @@ def print_similar_developers(candidates_count, stargazer_pages, repo_pages, repo
     similarities = compute_similarities(starting_developer, candidates)
     sorted_devs = [developer for _, developer in sorted(zip(similarities, candidates), key=lambda x: x[0])]
     print('top developers similar to the given: ')
-    for developer in sorted_devs[:count]:
+    for developer in sorted_devs[:candidates_count]:
         print(developer)
 
 
