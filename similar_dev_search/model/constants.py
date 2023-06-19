@@ -1,0 +1,7 @@
+HEADERS = {'Authorization': 'token '}
+
+STARGAZER_PAGES_NUM = 2
+REPOS_PAGES_NUM = 2
+
+REPOS_LIMIT = 4
+MAX_CANDIDATES_NUM = 100

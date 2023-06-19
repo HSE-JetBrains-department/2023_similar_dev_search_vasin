@@ -9,7 +9,7 @@ import httpx
 from dulwich.repo import Repo
 from tree_sitter import Language, Parser
 
-from model.constants import headers
+from model.constants import HEADERS
 from model.languages import all_languages
 
 
@@ -101,7 +101,7 @@ async def fetch_language_variables(file_url: str, file_name: str, asyncio_client
     else:
         client = asyncio_client
 
-    response = await client.get(file_url, headers=headers)
+    response = await client.get(file_url, headers=HEADERS)
     source_code = response.text
 
     lang, _ = enry.get_language_by_content(file_name, bytes(source_code, encoding='utf8'))

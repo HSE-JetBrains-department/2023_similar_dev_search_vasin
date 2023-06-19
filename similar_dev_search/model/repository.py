@@ -4,7 +4,7 @@ from collections import defaultdict
 import httpx
 
 import model.fetcher as fetcher
-from model.constants import headers
+from model.constants import HEADERS
 from model.language_extractor import fetch_language_variables
 
 
@@ -66,7 +66,7 @@ class Repository:
             client = asyncio_client
 
         files_url = f"https://api.github.com/repos/{self.dev_id}/{self.repo_name}/contents"
-        response = await client.get(files_url, headers=headers)
+        response = await client.get(files_url, headers=HEADERS)
         files_data = response.json()
 
         tasks = []

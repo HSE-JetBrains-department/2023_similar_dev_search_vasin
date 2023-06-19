@@ -6,7 +6,7 @@ import pandas as pd
 from sklearn.metrics.pairwise import cosine_similarity
 
 import model.fetcher as fetcher
-from model.constants import headers, repos_limit
+from model.constants import HEADERS, REPOS_LIMIT
 from model.repository import Repository
 
 
@@ -20,7 +20,7 @@ class Developer:
         url_prefix, id = url.split('/')
         self.id = id
 
-    async def get_stargazes(self, asyncio_client: httpx.AsyncClient = None) -> List[Repository]:
+    async def get_stargazed_repos(self, asyncio_client: httpx.AsyncClient = None) -> List[Repository]:
         """
         Gets list of stargazed repositories
         :param asyncio_client: asyncio client to perform requests from
@@ -74,7 +74,7 @@ class Developer:
         self.variables = defaultdict(int)
         repos = await self.get_repos()
 
-        for i in range(min(repos_limit, len(repos))):
+        for i in range(min(REPOS_LIMIT, len(repos))):
             for language in (await repos[i].get_languages(asyncio_client)).keys():
                 self.languages[language] += (await repos[i].get_languages(asyncio_client))[language]
             for variable in (await repos[i].get_variables(asyncio_client)).keys():
@@ -138,7 +138,7 @@ class Developer:
             client = asyncio_client
 
         repos_url = f"https://api.github.com/users/{self.id}/repos"
-        response = await client.get(repos_url, headers=headers)
+        response = await client.get(repos_url, headers=HEADERS)
         repos_data = response.json()
 
         if asyncio_client is None:

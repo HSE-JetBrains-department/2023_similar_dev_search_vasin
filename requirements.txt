@@ -7,3 +7,4 @@ tree_sitter==0.20.1
 dulwich~=0.20.32
 pandas==2.0.2
 scikit-learn==1.2.2
+click==8.1.3
