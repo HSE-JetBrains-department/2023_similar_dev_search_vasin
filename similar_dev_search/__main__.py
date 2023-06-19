@@ -53,3 +53,4 @@ if __name__ == '__main__':
     repos = asyncio.run(starting_developer.get_repos())
     candidates = asyncio.run(get_candidates(starting_developer))
     print('Gathered', len(candidates), 'candidates, limiting to', max_candidates_num)
+    candidates = candidates[0:min(len(candidates), max_candidates_num)]
