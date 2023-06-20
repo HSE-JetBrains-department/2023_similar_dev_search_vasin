@@ -5,7 +5,6 @@ from typing import List, Tuple
 import httpx
 from tqdm import tqdm
 
-from model import fetcher
 from model.constants import N_REPOS_FROM_STARGAZERS
 from model.developer import Developer
 from model.repository import Repository

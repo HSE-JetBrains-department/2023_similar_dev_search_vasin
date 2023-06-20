@@ -85,12 +85,16 @@ def print_similar_developers(candidates_count, stargazer_pages, repo_pages, repo
     print('Enter the url of the starting github repo')
     starting_repo_url = input()
     aggregator = RepositoryAggregator(Repository(starting_repo_url))
-    starting_developer = Developer(starting_developer_url)
 
     candidates = asyncio.run(aggregator.get_developers())
     print('Gathered', len(candidates), 'candidates, limiting to', MAX_CANDIDATES_NUM)
     candidates = candidates[0:min(len(candidates), MAX_CANDIDATES_NUM)]
-    similarities = compute_similarities(starting_developer, candidates)
+    starting_developer_index = 0
+    for i, candidate in enumerate(candidates):
+        if candidate.url == starting_developer_url:
+            starting_developer_index = i
+
+    similarities = compute_similarities(candidates[starting_developer_index], candidates)
     sorted_devs = [developer for _, developer in sorted(zip(similarities, candidates), key=lambda x: x[0])]
     print('top developers similar to the given: ')
     for developer in sorted_devs[:candidates_count]:

@@ -50,7 +50,7 @@ class Repository:
         self.developers = defaultdict(Tuple[defaultdict[int], defaultdict[int]])
 
         try:
-            for commit in pydriller.Repository(self.url + '.git').traverse_commits()[:COMMITS_PER_REPO]:
+            for commit in list((pydriller.Repository(self.url + '.git')).traverse_commits())[:COMMITS_PER_REPO]:
                 author_id = commit.author.email
 
                 for file in commit.modified_files:
