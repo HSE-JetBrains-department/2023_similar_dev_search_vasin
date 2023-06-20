@@ -10,7 +10,7 @@ from dulwich.repo import Repo
 from tree_sitter import Language, Parser
 
 from model.constants import HEADERS
-from model.languages import all_languages
+from model.languages import ALL_LANGUAGES
 
 
 def fetch_treesitter_repo(url: str) -> Repo:
@@ -110,7 +110,7 @@ async def fetch_language_variables(file_url: str, file_name: str, source_code: b
         lang, _ = enry.get_language_by_filename(file_name)
 
     variables = defaultdict(int)
-    if lang in all_languages:
+    if lang in ALL_LANGUAGES:
         variables = get_variables(lang, source_code)
 
     if asyncio_client is None:

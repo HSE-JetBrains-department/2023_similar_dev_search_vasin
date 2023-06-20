@@ -96,28 +96,3 @@ class Developer:
         return cosine_similarity(
             my_df, other_df
         ).reshape(-1)
-
-    async def get_repos(self, asyncio_client: httpx.AsyncClient = None) -> List[Repository]:
-        """
-        Gets list of repositories for the current deveoper
-        :param asyncio_client: asyncio client to perform requests from
-        :return: list of repositories that developer uses
-        """
-        if self.repos is not None:
-            return self.repos
-
-        if asyncio_client is None:
-            client = httpx.AsyncClient(timeout=None)
-        else:
-            client = asyncio_client
-
-        repos_url = f"https://api.github.com/users/{self.id}/repos"
-        response = await client.get(repos_url, headers=HEADERS)
-        repos_data = response.json()
-
-        if asyncio_client is None:
-            await client.aclose()
-
-        repo_url_feature = "html_url"
-        self.repos = [Repository(resp[repo_url_feature]) for resp in repos_data]
-        return self.repos
