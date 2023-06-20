@@ -8,7 +8,6 @@ from tqdm import tqdm
 
 import model.fetcher as fetcher
 from model.constants import COMMITS_PER_REPO
-from model.language_extractor import fetch_language_variables
 
 
 class Repository:
@@ -23,44 +22,6 @@ class Repository:
 
     def __str__(self):
         return self.url
-
-    async def _add_file_info(self, author_id: str, file: ModifiedFile) -> None:
-        """
-        Add information about modified file to developer information.
-        :param author_id: Unique name of GitHub developer.
-        :param file: File from GitHub repository.
-        :param repo_name: Name of repository.
-        """
-        if file.content:
-            languages, variables = await fetch_language_variables(file.filename, file.filename,
-                                                                  source_code=file.content)
-            for variable, count in variables:
-                self.developers[author_id][1][variable] += count
-            for language, count in languages:
-                self.developers[author_id][0][language] += count
-
-    async def get_developers(self) -> defaultdict[Tuple[defaultdict[int], defaultdict[int]]]:
-        """
-        Extract info about developers and their commits.
-        :param path_to_repo: Path to GitHub repository.
-        :return dict key = developer url, value = tuple of languages and variables dicts
-        """
-        if self.developers is not None:
-            return self.developers
-
-        self.developers = defaultdict(Tuple[defaultdict[int], defaultdict[int]])
-
-        try:
-            for commit in tqdm(list((pydriller.Repository(self.url + '.git')).traverse_commits())[:COMMITS_PER_REPO],
-                               "Parsing commits for " + self.url):
-                author_id = commit.author.email
-
-                for file in commit.modified_files:
-                    await self._add_file_info(author_id, file)
-        except Exception as error:
-            print('Something went wrong when analyzing ' + self.url + '.git: ' + str(error))
-            pass
-        return self.developers
 
     async def get_stargazers(self, asyncio_client: httpx.AsyncClient = None) -> List[str]:
         """
