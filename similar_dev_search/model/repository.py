@@ -5,6 +5,7 @@ import httpx
 import model.fetcher as fetcher
 from git import Repo
 
+
 class Repository:
     def __init__(self, url):
         self.url = url
