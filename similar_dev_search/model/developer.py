@@ -4,7 +4,6 @@ from typing import List
 import httpx
 
 import model.fetcher as fetcher
-from model.constants import HEADERS
 from model.repository import Repository
 
 
