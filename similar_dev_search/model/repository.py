@@ -1,13 +1,8 @@
-from collections import defaultdict
-from typing import List, Tuple
+from typing import List
 
 import httpx
-import pydriller
-from pydriller import ModifiedFile
-from tqdm import tqdm
 
 import model.fetcher as fetcher
-from model.constants import COMMITS_PER_REPO
 
 
 class Repository:
