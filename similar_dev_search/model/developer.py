@@ -39,32 +39,21 @@ class Developer:
 
         return starred_repos
 
+    def get_languages(self) -> defaultdict[int]:
+        """
+        Gets dict of languages used by the developer
+        :param asyncio_client: asyncio client to perform requests from
+        :return: dict with language key and number of occurrences value
+        """
+        return self.languages
+
+    def get_variables(self) -> defaultdict[int]:
+        """
+        Gets dict of variables used by the developer
+        :param asyncio_client:  asyncio client to perform requests from
+        :return: dict with variable key and number of occurrences value
+        """
+        return self.variables
+
     def __str__(self) -> str:
         return self.url
-
-    async def get_repos(self, asyncio_client: httpx.AsyncClient = None) -> List[Repository]:
-        """
-        Gets list of repositories for the current deveoper
-        :param asyncio_client: asyncio client to perform requests from
-        :return: list of repositories that developer uses
-        """
-        if self.repos is not None:
-            return self.repos
-
-        if asyncio_client is None:
-            client = httpx.AsyncClient(timeout=None)
-        else:
-            client = asyncio_client
-
-        repos_url = f"https://api.github.com/users/{self.id}/repos"
-        response = await client.get(repos_url, headers=HEADERS)
-
-        repos_data = response.json()
-
-        if asyncio_client is None:
-            await client.aclose()
-
-        repo_url_feature = "html_url"
-        self.repos = [Repository(resp[repo_url_feature]) for resp in repos_data]
-        return self.repos
-
