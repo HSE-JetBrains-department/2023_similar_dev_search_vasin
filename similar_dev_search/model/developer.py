@@ -1,19 +1,19 @@
 from collections import defaultdict
-from typing import List, Tuple
+from typing import List
 
 import httpx
 import pandas as pd
 from sklearn.metrics.pairwise import cosine_similarity
 
 import model.fetcher as fetcher
-from model.constants import HEADERS, REPOS_LIMIT
+from model.constants import HEADERS
 from model.repository import Repository
 
 
 class Developer:
     def __init__(self, url: str):
-        self.languages = None
-        self.variables = None
+        self.languages = defaultdict(int)
+        self.variables = defaultdict(int)
         self.repos = None
         self.url = url
         url = url.replace('https://', '')
@@ -39,47 +39,21 @@ class Developer:
 
         return starred_repos
 
-    async def get_languages(self, asyncio_client: httpx.AsyncClient = None) -> defaultdict[int]:
+    def get_languages(self) -> defaultdict[int]:
         """
         Gets dict of languages used by the developer
         :param asyncio_client: asyncio client to perform requests from
         :return: dict with language key and number of occurrences value
         """
-        if self.languages is not None:
-            return self.languages
-        languages, _ = await self.get_languages_variables(asyncio_client)
-        return languages
+        return self.languages
 
-    async def get_variables(self, asyncio_client: httpx.AsyncClient = None) -> defaultdict[int]:
+    def get_variables(self) -> defaultdict[int]:
         """
         Gets dict of variables used by the developer
         :param asyncio_client:  asyncio client to perform requests from
         :return: dict with variable key and number of occurrences value
         """
-        if self.variables is not None:
-            return self.variables
-        _, variables = await self.get_languages_variables(asyncio_client)
-        return variables
-
-    async def get_languages_variables(self, asyncio_client: httpx.AsyncClient = None) \
-            -> Tuple[defaultdict[int], defaultdict[int]]:
-        """
-        Gets both languages and variables that developer uses
-        :param asyncio_client:  asyncio client to perform requests from
-        :return: dict of languages, dict of variables
-        """
-        if self.languages is not None and self.variables is not None:
-            return self.languages, self.variables
-        self.languages = defaultdict(int)
-        self.variables = defaultdict(int)
-        repos = await self.get_repos()
-
-        for i in range(min(REPOS_LIMIT, len(repos))):
-            for language in (await repos[i].get_languages(asyncio_client)).keys():
-                self.languages[language] += (await repos[i].get_languages(asyncio_client))[language]
-            for variable in (await repos[i].get_variables(asyncio_client)).keys():
-                self.languages[variable] += (await repos[i].get_variables(asyncio_client))[variable]
-        return self.languages, self.variables
+        return self.variables
 
     def __str__(self) -> str:
         return self.url
@@ -90,11 +64,11 @@ class Developer:
         :return: dict of languages, variables and their respective occurrences
         """
         total_dict = dict()
-        for variable in (await self.get_variables()).keys():
-            total_dict[variable] = (await self.get_variables())[variable]
+        for variable in (self.get_variables()).keys():
+            total_dict[variable] = (self.get_variables())[variable]
 
-        for language in (await self.get_languages()).keys():
-            total_dict[language] = (await self.get_languages())[language]
+        for language in (self.get_languages()).keys():
+            total_dict[language] = (self.get_languages())[language]
 
         return total_dict
 
@@ -145,6 +119,5 @@ class Developer:
             await client.aclose()
 
         repo_url_feature = "html_url"
-        # print(repos_data)
         self.repos = [Repository(resp[repo_url_feature]) for resp in repos_data]
         return self.repos

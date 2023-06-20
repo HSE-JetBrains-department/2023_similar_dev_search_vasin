@@ -9,6 +9,8 @@ from model import constants
 from model.constants import MAX_CANDIDATES_NUM
 from model.developer import Developer
 from model.fetcher import fetch_stargazers_for_repo
+from model.repository import Repository
+from model.repository_aggregator import RepositoryAggregator
 
 
 async def get_candidates(start_developer: Developer, asyncio_client: httpx.AsyncClient = None) -> List[Developer]:
@@ -61,21 +63,31 @@ def compute_similarities(main_developer, developers) -> List[float]:
 @click.option('--stargazer_pages', default=2, help='Number of pages to collect stargazers from.')
 @click.option('--repo_pages', default=2, help='Number of pages for each developer to collect stargazed repos from.')
 @click.option('--repo_limit', default=4, help='Number of repositories to analyze for each developer.')
-def print_similar_developers(candidates_count, stargazer_pages, repo_pages, repo_limit):
+@click.option('--top_repos_from_stargazers', default=100,
+              help='Number of top repos from stargazers of the initial to analyze.')
+@click.option('--commits_per_repo', default=5, help='Number of commits to analyze.')
+def print_similar_developers(candidates_count, stargazer_pages, repo_pages, repo_limit, top_repos_from_stargazers,
+                             commits_per_repo):
     constants.MAX_CANDIDATES_NUM = candidates_count
     constants.STARGAZER_PAGES_NUM = stargazer_pages
     constants.REPOS_PAGES_NUM = repo_pages
     constants.REPOS_LIMIT = repo_limit
+    constants.N_REPOS_FROM_STARGAZERS = top_repos_from_stargazers
+    constants.COMMITS_PER_REPO = commits_per_repo
+
     print('Enter github token:')
     token = input()
     constants.HEADERS['Authorization'] = 'token ' + token
 
     print('Enter the github url of the developer, for which to find similar devs: ')
     starting_developer_url = input()
+
+    print('Enter the url of the starting github repo')
+    starting_repo_url = input()
+    aggregator = RepositoryAggregator(Repository(starting_repo_url))
     starting_developer = Developer(starting_developer_url)
 
-    repos = asyncio.run(starting_developer.get_repos())
-    candidates = asyncio.run(get_candidates(starting_developer))
+    candidates = asyncio.run(aggregator.get_developers())
     print('Gathered', len(candidates), 'candidates, limiting to', MAX_CANDIDATES_NUM)
     candidates = candidates[0:min(len(candidates), MAX_CANDIDATES_NUM)]
     similarities = compute_similarities(starting_developer, candidates)

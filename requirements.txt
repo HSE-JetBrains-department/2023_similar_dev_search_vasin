@@ -1,5 +1,5 @@
 tqdm==4.65.0
-PyDriller==2.4.1
+PyDriller==2.5
 httpx==0.24.0
 pygments==2.15.1
 enry==0.1.1

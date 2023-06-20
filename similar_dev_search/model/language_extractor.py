@@ -57,7 +57,7 @@ Language.build_library(
 )
 
 
-def get_variables(language: str, code: str) -> defaultdict[int]:
+def get_variables(language: str, code: bytes) -> defaultdict[int]:
     """
     Returns variables from code
     :param language: language of the code
@@ -65,7 +65,6 @@ def get_variables(language: str, code: str) -> defaultdict[int]:
     :return: dict of variables {variable_name: occurrences}
     """
     identifiers = defaultdict(int)
-    code = bytes(code, 'utf-8')
     parser = Parser()
     language = language.lower()
 
@@ -87,10 +86,12 @@ def get_variables(language: str, code: str) -> defaultdict[int]:
     return identifiers
 
 
-async def fetch_language_variables(file_url: str, file_name: str, asyncio_client: httpx.AsyncClient = None) -> \
+async def fetch_language_variables(file_url: str, file_name: str, source_code: bytes = None,
+                                   asyncio_client: httpx.AsyncClient = None) -> \
         Tuple[str, defaultdict[int]]:
     """
     Returns language used and dict of variables from file
+    :param source_code: source code, if it is already extracted
     :param file_url: url of file on github
     :param file_name: name of the file
     :param asyncio_client: asyncio client to perform requests from
@@ -100,11 +101,11 @@ async def fetch_language_variables(file_url: str, file_name: str, asyncio_client
         client = httpx.AsyncClient(timeout=None)
     else:
         client = asyncio_client
+    if source_code is None:
+        response = await client.get(file_url, headers=HEADERS)
+        source_code = bytes(response.text, encoding='utf8')
 
-    response = await client.get(file_url, headers=HEADERS)
-    source_code = response.text
-
-    lang, _ = enry.get_language_by_content(file_name, bytes(source_code, encoding='utf8'))
+    lang, _ = enry.get_language_by_content(file_name, source_code)
     if lang == '':
         lang, _ = enry.get_language_by_filename(file_name)
 
