@@ -4,6 +4,7 @@ from typing import List, Tuple
 import httpx
 import pydriller
 from pydriller import ModifiedFile
+from tqdm import tqdm
 
 import model.fetcher as fetcher
 from model.constants import COMMITS_PER_REPO
@@ -50,13 +51,14 @@ class Repository:
         self.developers = defaultdict(Tuple[defaultdict[int], defaultdict[int]])
 
         try:
-            for commit in list((pydriller.Repository(self.url + '.git')).traverse_commits())[:COMMITS_PER_REPO]:
+            for commit in tqdm(list((pydriller.Repository(self.url + '.git')).traverse_commits())[:COMMITS_PER_REPO],
+                               "Parsing commits for " + self.url):
                 author_id = commit.author.email
 
                 for file in commit.modified_files:
                     await self._add_file_info(author_id, file)
-        except Exception:
-            print('Something went wrong when analyzing ' + self.url + '.git')
+        except Exception as error:
+            print('Something went wrong when analyzing ' + self.url + '.git: ' + str(error))
             pass
         return self.developers
 
