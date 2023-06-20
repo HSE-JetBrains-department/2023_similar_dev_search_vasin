@@ -2,11 +2,8 @@ from collections import defaultdict
 from typing import List
 
 import httpx
-import pandas as pd
-from sklearn.metrics.pairwise import cosine_similarity
 
 import model.fetcher as fetcher
-from model.constants import HEADERS
 from model.repository import Repository
 
 
