@@ -1,12 +1,8 @@
-import os
 from collections import defaultdict
-from pathlib import Path
 from typing import Tuple
 
 import enry
-import git
 import httpx
-from tree_sitter import Language, Parser
 
 from model.constants import HEADERS
 from model.languages import ALL_LANGUAGES
