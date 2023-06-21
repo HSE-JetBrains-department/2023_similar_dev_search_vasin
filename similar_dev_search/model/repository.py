@@ -36,7 +36,7 @@ class Repository:
         :param repo_name: Name of repository.
         """
         if file.content:
-            languages, variables = await fetch_language_variables(file.new_path, file.filename,
+            languages, variables = await fetch_language_variables(self.repo_path, file.filename,
                                                                   source_code=file.content)
             for variable, count in variables:
                 self.developers[author_id][1][variable] += count
@@ -55,7 +55,7 @@ class Repository:
         self.developers = Counter(Tuple[Counter[int], Counter[int]])
 
         try:
-            for commit in tqdm(list((pydriller.Repository(self.url + '.git')).traverse_commits())[:COMMITS_PER_REPO],
+            for commit in tqdm(list((pydriller.Repository(self.repo_path)).traverse_commits())[:COMMITS_PER_REPO],
                                "Parsing commits for " + self.url):
                 author_id = commit.author.email
 

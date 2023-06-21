@@ -9,7 +9,6 @@ import httpx
 from dulwich.repo import Repo
 from tree_sitter import Language, Parser
 
-from model.constants import HEADERS
 from model.languages import ALL_LANGUAGES
 
 
