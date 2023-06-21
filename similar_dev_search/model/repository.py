@@ -1,5 +1,4 @@
 from typing import List
-
 import httpx
 
 import model.fetcher as fetcher
@@ -36,3 +35,4 @@ class Repository:
 
         await client.aclose()
         return developers_urls
+

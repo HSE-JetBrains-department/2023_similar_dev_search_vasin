@@ -13,12 +13,14 @@ class Developer:
         self.languages = defaultdict(int)
         self.variables = defaultdict(int)
         self.repos = None
+
         self.url = url
         url = url.replace('https://', '')
         url_prefix, id = url.split('/')
         self.id = id
 
     async def get_stargazed_repos(self, asyncio_client: httpx.AsyncClient = None) -> List[Repository]:
+
         """
         Gets list of stargazed repositories
         :param asyncio_client: asyncio client to perform requests from
@@ -56,6 +58,7 @@ class Developer:
 
         repos_url = f"https://api.github.com/users/{self.id}/repos"
         response = await client.get(repos_url, headers=HEADERS)
+
         repos_data = response.json()
 
         if asyncio_client is None:
@@ -64,3 +67,4 @@ class Developer:
         repo_url_feature = "html_url"
         self.repos = [Repository(resp[repo_url_feature]) for resp in repos_data]
         return self.repos
+
