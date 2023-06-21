@@ -1,4 +1,4 @@
-from collections import defaultdict
+from collections import Counter
 from typing import List, Tuple
 
 import httpx
@@ -39,7 +39,7 @@ class Repository:
             for language, count in languages:
                 self.developers[author_id][0][language] += count
 
-    async def get_developers(self) -> defaultdict[Tuple[defaultdict[int], defaultdict[int]]]:
+    async def get_developers(self) -> Counter[Tuple[Counter[int], Counter[int]]]:
         """
         Extract info about developers and their commits.
         :param path_to_repo: Path to GitHub repository.
@@ -48,7 +48,7 @@ class Repository:
         if self.developers is not None:
             return self.developers
 
-        self.developers = defaultdict(Tuple[defaultdict[int], defaultdict[int]])
+        self.developers = Counter(Tuple[Counter[int], Counter[int]])
 
         try:
             for commit in tqdm(list((pydriller.Repository(self.url + '.git')).traverse_commits())[:COMMITS_PER_REPO],

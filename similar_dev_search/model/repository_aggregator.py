@@ -1,5 +1,5 @@
 import asyncio
-from collections import defaultdict
+from collections import Counter
 from typing import List, Tuple
 
 import httpx
@@ -13,6 +13,7 @@ from model.repository import Repository
 class RepositoryAggregator:
     def __init__(self, starting_repo: Repository):
         self.starting_repo = starting_repo
+        self.top_repos = Counter()
         self.developers_dict = None
         self.developers_list = None
         self.repos = None
@@ -31,7 +32,7 @@ class RepositoryAggregator:
         else:
             client = asyncio_client
 
-        self.developers_dict = defaultdict(Tuple[defaultdict[int], defaultdict[int]])
+        self.developers_dict = Counter(Tuple[Counter[int], Counter[int]])
         tasks = []
         for repo in tqdm((await self.get_repos(client))[:N_REPOS_FROM_STARGAZERS], "Analyzing repos"):
             tasks.append(repo.get_developers())
@@ -71,7 +72,7 @@ class RepositoryAggregator:
             client = asyncio_client
 
         stargazers = [Developer(url) for url in await self.starting_repo.get_stargazers()]
-        top = defaultdict(int)
+        self.top_repos = Counter()
         tasks = []
 
         for stargazer in stargazers:
@@ -81,9 +82,9 @@ class RepositoryAggregator:
 
         for repos in result:
             for repo in repos:
-                top[repo.url] += 1
+                self.top_repos[repo.url] += 1
 
-        sorted_repos = [Repository(url) for url, _ in sorted(top.items(), key=lambda x: -x[1])]
+        sorted_repos = [Repository(url) for url, _ in self.top_repos.most_common()]
 
         self.repos = sorted_repos
         await client.aclose()

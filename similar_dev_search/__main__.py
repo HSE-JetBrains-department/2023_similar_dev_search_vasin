@@ -66,8 +66,9 @@ def compute_similarities(main_developer, developers) -> List[float]:
 @click.option('--top_repos_from_stargazers', default=100,
               help='Number of top repos from stargazers of the initial to analyze.')
 @click.option('--commits_per_repo', default=5, help='Number of commits to analyze.')
+@click.option('--print_popular_repos', is_flag=True)
 def print_similar_developers(candidates_count, stargazer_pages, repo_pages, repo_limit, top_repos_from_stargazers,
-                             commits_per_repo):
+                             commits_per_repo, print_popular_repos):
     constants.MAX_CANDIDATES_NUM = candidates_count
     constants.STARGAZER_PAGES_NUM = stargazer_pages
     constants.REPOS_PAGES_NUM = repo_pages
@@ -85,6 +86,11 @@ def print_similar_developers(candidates_count, stargazer_pages, repo_pages, repo
     print('Enter the url of the starting github repo')
     starting_repo_url = input()
     aggregator = RepositoryAggregator(Repository(starting_repo_url))
+
+    aggregator.get_repos()
+
+    if print_popular_repos:
+        print(f"Most common repos for stargazers of {starting_repo_url}: \n{aggregator.top_repos.most_common()}")
 
     candidates = asyncio.run(aggregator.get_developers())
     print('Gathered', len(candidates), 'candidates, limiting to', MAX_CANDIDATES_NUM)
