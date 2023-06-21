@@ -1,4 +1,4 @@
-from collections import defaultdict
+from collections import Counter
 from typing import List
 
 import httpx
@@ -6,14 +6,13 @@ import pandas as pd
 from sklearn.metrics.pairwise import cosine_similarity
 
 import model.fetcher as fetcher
-from model.constants import HEADERS
 from model.repository import Repository
 
 
 class Developer:
     def __init__(self, url: str):
-        self.languages = defaultdict(int)
-        self.variables = defaultdict(int)
+        self.languages = Counter(int)
+        self.variables = Counter(int)
         self.repos = None
         self.url = url
         url = url.replace('https://', '')
@@ -39,7 +38,7 @@ class Developer:
 
         return starred_repos
 
-    def get_languages(self) -> defaultdict[int]:
+    def get_languages(self) -> Counter[int]:
         """
         Gets dict of languages used by the developer
         :param asyncio_client: asyncio client to perform requests from
@@ -47,7 +46,7 @@ class Developer:
         """
         return self.languages
 
-    def get_variables(self) -> defaultdict[int]:
+    def get_variables(self) -> Counter[int]:
         """
         Gets dict of variables used by the developer
         :param asyncio_client:  asyncio client to perform requests from
@@ -56,7 +55,8 @@ class Developer:
         return self.variables
 
     def __str__(self) -> str:
-        return self.url
+        return f"{self.url}: most popular languages: {self.get_languages().most_common(3)}, " \
+               f"variables: {self.get_variables().most_common(3)}"
 
     async def get_total_dict(self) -> dict[int]:
         """
