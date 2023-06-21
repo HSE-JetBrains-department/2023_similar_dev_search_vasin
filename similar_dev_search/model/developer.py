@@ -1,20 +1,26 @@
+from collections import defaultdict
 from typing import List
 
 import httpx
 
 import model.fetcher as fetcher
-from model.constants import headers
+from model.constants import HEADERS
 from model.repository import Repository
 
 
 class Developer:
     def __init__(self, url: str):
+        self.languages = defaultdict(int)
+        self.variables = defaultdict(int)
+        self.repos = None
+
         self.url = url
         url = url.replace('https://', '')
         url_prefix, id = url.split('/')
         self.id = id
 
-    async def get_stargazes(self, asyncio_client: httpx.AsyncClient = None) -> List[Repository]:
+    async def get_stargazed_repos(self, asyncio_client: httpx.AsyncClient = None) -> List[Repository]:
+
         """
         Gets list of stargazed repositories
         :param asyncio_client: asyncio client to perform requests from
@@ -36,7 +42,6 @@ class Developer:
     def __str__(self) -> str:
         return self.url
 
-
     async def get_repos(self, asyncio_client: httpx.AsyncClient = None) -> List[Repository]:
         """
         Gets list of repositories for the current deveoper
@@ -52,13 +57,14 @@ class Developer:
             client = asyncio_client
 
         repos_url = f"https://api.github.com/users/{self.id}/repos"
-        response = await client.get(repos_url, headers=headers)
+        response = await client.get(repos_url, headers=HEADERS)
+
         repos_data = response.json()
 
         if asyncio_client is None:
             await client.aclose()
 
         repo_url_feature = "html_url"
-        # print(repos_data)
         self.repos = [Repository(resp[repo_url_feature]) for resp in repos_data]
         return self.repos
+

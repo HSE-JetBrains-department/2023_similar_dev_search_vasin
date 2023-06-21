@@ -4,7 +4,8 @@ from typing import List
 
 import httpx
 
-from model.constants import headers, stargazer_pages_num, repos_pages_num
+from model.constants import HEADERS, STARGAZER_PAGES_NUM, REPOS_PAGES_NUM
+
 from model.repository import Repository
 
 
@@ -16,7 +17,8 @@ async def fetch_stargazers_for_page(client: httpx.AsyncClient, url, page):
     :param page: page number
     :return: Json with stargazers
     """
-    response = await client.get(url.format(page), headers=headers)
+    response = await client.get(url.format(page), headers=HEADERS)
+
     return response.json()
 
 
@@ -38,7 +40,8 @@ async def fetch_stargazers_for_repo(url: str, asyncio_client: httpx.AsyncClient 
         client = httpx.AsyncClient(timeout=None)
     else:
         client = asyncio_client
-    for page in range(1, stargazer_pages_num):
+    for page in range(1, STARGAZER_PAGES_NUM):
+
         tasks.append(
             fetch_stargazers_for_page(client, url, page))
 
@@ -67,7 +70,8 @@ async def fetch_all_repos_for_developer(page_url_template: str, developer_id: st
     response = await asyncio.gather(
         *map(fetch_repos, itertools.repeat(asyncio_client), itertools.repeat(page_url_template),
              itertools.repeat(developer_id),
-             list(range(1, repos_pages_num)))
+             list(range(1, REPOS_PAGES_NUM)))
+
     )
     for repo_json in response[0]:
         starred_repos.append(Repository(repo_json[repo_url_feature]))
@@ -83,5 +87,5 @@ async def fetch_repos(client: httpx.AsyncClient, page_url_template: str, develop
     :param developer_id: id of developer
     :param page: page number
     """
-    response = await client.get(page_url_template.format(developer_id, page), headers=headers)
+    response = await client.get(page_url_template.format(developer_id, page), headers=HEADERS)
     return response.json()

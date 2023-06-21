@@ -1,7 +1,12 @@
-headers = {'Authorization': 'token '}
+HEADERS = {'Authorization': 'token '}
 
-stargazer_pages_num = 2
-repos_pages_num = 2
+STARGAZER_PAGES_NUM = 2
+REPOS_PAGES_NUM = 2
 
-repos_limit = 4
-max_candidates_num = 100
+REPOS_LIMIT = 4
+MAX_CANDIDATES_NUM = 100
+
+N_REPOS_FROM_STARGAZERS = 100
+
+COMMITS_PER_REPO = 5
+
