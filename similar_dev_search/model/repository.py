@@ -3,7 +3,7 @@ from typing import List
 import httpx
 
 import model.fetcher as fetcher
-
+from git import Repo
 
 class Repository:
     def __init__(self, url):
@@ -14,6 +14,8 @@ class Repository:
         self.developers = None
         self.dev_id = self.url.split('/')[-2]
         self.repo_name = self.url.split('/')[-1]
+        self.repo_path = f'repositories/{self.repo_name}'
+        Repo.clone_from(self.url, self.repo_path)
 
     def __str__(self):
         return self.url
