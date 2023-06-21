@@ -20,8 +20,8 @@ class Repository:
         self.dev_id = self.url.split('/')[-2]
         self.repo_name = self.url.split('/')[-1]
         self.repo_path = f'repositories/{self.repo_name}'
-        self.modifications = defaultdict(DeveloperEntry)
         Repo.clone_from(self.url, self.repo_path)
+        self.modifications = defaultdict(DeveloperEntry)
 
     def __str__(self):
         return self.url
