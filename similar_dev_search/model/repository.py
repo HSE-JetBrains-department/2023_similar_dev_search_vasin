@@ -55,7 +55,7 @@ class Repository:
         if self.developers is not None:
             return self.developers
 
-        self.developers = defaultdict(Tuple[Counter, Counter])
+        self.developers = defaultdict[Tuple[Counter, Counter]]()
 
         try:
             for commit in tqdm(list((pydriller.Repository(self.repo_path)).traverse_commits())[:COMMITS_PER_REPO],
