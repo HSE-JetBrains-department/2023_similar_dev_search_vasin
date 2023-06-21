@@ -56,14 +56,14 @@ Language.build_library(
 )
 
 
-def get_variables(language: str, code: bytes) -> Counter[int]:
+def get_variables(language: str, code: bytes) -> Counter:
     """
     Returns variables from code
     :param language: language of the code
     :param code: source code
     :return: dict of variables {variable_name: occurrences}
     """
-    identifiers = Counter(int)
+    identifiers = Counter()
     parser = Parser()
     language = language.lower()
 
@@ -87,7 +87,7 @@ def get_variables(language: str, code: bytes) -> Counter[int]:
 
 async def fetch_language_variables(repo_path: str, file_name: str, source_code: bytes = None,
                                    asyncio_client: httpx.AsyncClient = None) -> \
-        Tuple[str, Counter[int]]:
+        Tuple[str, Counter]:
     """
     Returns language used and dict of variables from file
     :param source_code: source code, if it is already extracted
@@ -102,7 +102,7 @@ async def fetch_language_variables(repo_path: str, file_name: str, source_code: 
         if lang == '':
             lang, _ = enry.get_language_by_filename(file_name)
 
-    variables = Counter(int)
+    variables = Counter()
     if lang in ALL_LANGUAGES:
         variables = get_variables(lang, source_code)
 

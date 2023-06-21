@@ -1,5 +1,5 @@
 import asyncio
-from collections import Counter
+from collections import Counter, defaultdict
 from typing import List, Tuple
 
 import httpx
@@ -32,7 +32,7 @@ class RepositoryAggregator:
         else:
             client = asyncio_client
 
-        self.developers_dict = Counter(Tuple[Counter[int], Counter[int]])
+        self.developers_dict = defaultdict(Tuple[Counter, Counter])
         tasks = []
         for repo in tqdm((await self.get_repos(client))[:N_REPOS_FROM_STARGAZERS], "Analyzing repos"):
             tasks.append(repo.get_developers())

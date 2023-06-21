@@ -11,8 +11,8 @@ from model.repository import Repository
 
 class Developer:
     def __init__(self, url: str):
-        self.languages = Counter(int)
-        self.variables = Counter(int)
+        self.languages = Counter()
+        self.variables = Counter()
         self.repos = None
         self.url = url
         url = url.replace('https://', '')
@@ -38,7 +38,7 @@ class Developer:
 
         return starred_repos
 
-    def get_languages(self) -> Counter[int]:
+    def get_languages(self) -> Counter:
         """
         Gets dict of languages used by the developer
         :param asyncio_client: asyncio client to perform requests from
@@ -46,7 +46,7 @@ class Developer:
         """
         return self.languages
 
-    def get_variables(self) -> Counter[int]:
+    def get_variables(self) -> Counter:
         """
         Gets dict of variables used by the developer
         :param asyncio_client:  asyncio client to perform requests from

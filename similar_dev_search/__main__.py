@@ -87,7 +87,7 @@ def print_similar_developers(candidates_count, stargazer_pages, repo_pages, repo
     starting_repo_url = input()
     aggregator = RepositoryAggregator(Repository(starting_repo_url))
 
-    aggregator.get_repos()
+    asyncio.run(aggregator.get_repos())
 
     if print_popular_repos:
         print(f"Most common repos for stargazers of {starting_repo_url}: \n{aggregator.top_repos.most_common()}")
