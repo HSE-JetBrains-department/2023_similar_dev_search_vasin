@@ -7,6 +7,9 @@ from tqdm import tqdm
 import model.fetcher as fetcher
 from git import Repo
 
+from model.developer_entry import DeveloperEntry
+
+
 class Repository:
     def __init__(self, url):
         self.url = url
@@ -17,6 +20,7 @@ class Repository:
         self.dev_id = self.url.split('/')[-2]
         self.repo_name = self.url.split('/')[-1]
         self.repo_path = f'repositories/{self.repo_name}'
+        self.modifications = defaultdict(DeveloperEntry)
         Repo.clone_from(self.url, self.repo_path)
 
     def __str__(self):
@@ -49,14 +53,11 @@ class Repository:
         :param repo_name: Name of repository.
         """
         if file.content:
-            languages, variables = await fetch_language_variables(self.repo_path, file.filename,
-                                                                    source_code=file.content) #TODO in next prs
-            for variable, count in variables:
-                self.developers[author_id][1][variable] += count
-            for language, count in languages:
-                 self.developers[author_id][0][language] += count
+            # TODO add languages and variables in next prs
+            self.modifications[file.filename][0][author_id] += file.added_lines
+            self.modifications[file.filename][1][author_id] += file.deleted_lines
 
-    async def get_developers(self) -> Counter[Tuple[Counter[int], Counter[int]]]:
+    async def get_developers(self) -> Counter[DeveloperEntry]:
         """
         Extract info about developers and their commits.
         :param path_to_repo: Path to GitHub repository.
@@ -65,7 +66,7 @@ class Repository:
         if self.developers is not None:
             return self.developers
 
-        self.developers = defaultdict(Tuple[Counter[int], Counter[int]])
+        self.developers = defaultdict(DeveloperEntry)
 
         try:
              for commit in tqdm(list((pydriller.Repository(self.repo_path)).traverse_commits())[:COMMITS_PER_REPO],

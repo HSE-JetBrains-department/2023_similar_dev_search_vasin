@@ -7,6 +7,7 @@ from tqdm import tqdm
 
 from model.constants import N_REPOS_FROM_STARGAZERS
 from model.developer import Developer
+from model.developer_entry import DeveloperEntry
 from model.repository import Repository
 
 
@@ -32,7 +33,7 @@ class RepositoryAggregator:
         else:
             client = asyncio_client
 
-        self.developers_dict = defaultdict(Tuple[Counter, Counter])
+        self.developers_dict = defaultdict(DeveloperEntry)
         tasks = []
         for repo in tqdm((await self.get_repos(client))[:N_REPOS_FROM_STARGAZERS], "Analyzing repos"):
             tasks.append(repo.get_developers())
