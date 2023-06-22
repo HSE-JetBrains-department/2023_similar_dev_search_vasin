@@ -70,7 +70,8 @@ async def fetch_all_repos_for_developer(page_url_template: str, developer_id: st
              list(range(1, REPOS_PAGES_NUM)))
     )
     for repo_json in response[0]:
-        starred_repos.append(Repository(repo_json[repo_url_feature]))
+        if repo_json != 'message':
+            starred_repos.append(Repository(repo_json[repo_url_feature]))
 
     return starred_repos
 

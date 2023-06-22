@@ -25,9 +25,6 @@ class Repository:
         self.repo_name = self.url.split('/')[-1]
         self.repo_path = f'repositories/{self.repo_name}'
 
-        if not os.path.exists(self.repo_path):
-            Repo.clone_from(self.url, self.repo_path)
-
     def __str__(self):
         return self.url
 
@@ -55,10 +52,10 @@ class Repository:
         if self.developers is not None:
             return self.developers
 
-        self.developers = defaultdict[Tuple[Counter, Counter]]()
+        self.developers = defaultdict(Tuple[Counter, Counter])
 
         try:
-            for commit in tqdm(list((pydriller.Repository(self.repo_path)).traverse_commits())[:COMMITS_PER_REPO],
+            for commit in tqdm(list((pydriller.Repository(self.url)).traverse_commits())[:COMMITS_PER_REPO],
                                "Parsing commits for " + self.url):
                 author_id = commit.author.email
 

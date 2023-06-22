@@ -1,5 +1,5 @@
 import os
-from collections import Counter
+from collections import defaultdict
 from pathlib import Path
 from typing import Tuple
 
@@ -9,6 +9,7 @@ import httpx
 from dulwich.repo import Repo
 from tree_sitter import Language, Parser
 
+from model.constants import HEADERS
 from model.languages import ALL_LANGUAGES
 
 
@@ -56,14 +57,14 @@ Language.build_library(
 )
 
 
-def get_variables(language: str, code: bytes) -> Counter:
+def get_variables(language: str, code: bytes) -> defaultdict[int]:
     """
     Returns variables from code
     :param language: language of the code
     :param code: source code
     :return: dict of variables {variable_name: occurrences}
     """
-    identifiers = Counter()
+    identifiers = defaultdict(int)
     parser = Parser()
     language = language.lower()
 
@@ -85,25 +86,34 @@ def get_variables(language: str, code: bytes) -> Counter:
     return identifiers
 
 
-async def fetch_language_variables(repo_path: str, file_name: str, source_code: bytes = None,
+async def fetch_language_variables(file_url: str, file_name: str, source_code: bytes = None,
                                    asyncio_client: httpx.AsyncClient = None) -> \
-        Tuple[str, Counter]:
+        Tuple[str, defaultdict[int]]:
     """
     Returns language used and dict of variables from file
     :param source_code: source code, if it is already extracted
-    :param repo_path: path to the repo
+    :param file_url: url of file on github
     :param file_name: name of the file
     :param asyncio_client: asyncio client to perform requests from
     :return: language and dict of variables
     """
+    if asyncio_client is None:
+        client = httpx.AsyncClient(timeout=None)
+    else:
+        client = asyncio_client
+    if source_code is None:
+        response = await client.get(file_url, headers=HEADERS)
+        source_code = bytes(response.text, encoding='utf8')
 
-    with open(os.path.join(repo_path, file_name)) as file:
-        lang, _ = enry.get_language_by_content(file_name, bytes(file.read()))
-        if lang == '':
-            lang, _ = enry.get_language_by_filename(file_name)
+    lang, _ = enry.get_language_by_content(file_name, source_code)
+    if lang == '':
+        lang, _ = enry.get_language_by_filename(file_name)
 
-    variables = Counter()
+    variables = defaultdict(int)
     if lang in ALL_LANGUAGES:
         variables = get_variables(lang, source_code)
+
+    if asyncio_client is None:
+        await client.aclose()
 
     return lang, variables
