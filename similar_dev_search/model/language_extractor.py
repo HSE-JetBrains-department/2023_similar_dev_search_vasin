@@ -20,14 +20,6 @@ async def fetch_language_variables(repo_path: str, file_name: str, source_code: 
     :param asyncio_client: asyncio client to perform requests from
     :return: language and dict of variables
     """
-    if asyncio_client is None:
-        client = httpx.AsyncClient(timeout=None)
-    else:
-        client = asyncio_client
-    if source_code is None:
-        response = await client.get(repo_path, headers=HEADERS)
-        source_code = bytes(response.text, encoding='utf8')
-
     with open(os.path.join(repo_path, file_name)):
         lang, _ = enry.get_language_by_content(file_name, source_code)
         if lang == '':
